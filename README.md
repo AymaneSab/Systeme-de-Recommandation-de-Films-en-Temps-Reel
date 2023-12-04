@@ -1,5 +1,7 @@
 # Système de Recommandation de Films en Temps Réel
 
+[!Alt text](https://maghreb.simplonline.co/_next/image?url=https%3A%2F%2Fsimplonline-v3-prod.s3.eu-west-3.amazonaws.com%2Fmedia%2Fimage%2Fpng%2Fcapture-656ca181b6f35308504279.png&w=1280&q=75)
+
 Ce projet a pour objectif de concevoir un système de recommandation de films en temps réel en utilisant les technologies Apache Spark, Elasticsearch, Kibana et Flask. L'ensemble du processus, du prétraitement des données à la visualisation en passant par la construction du modèle de recommandation, est couvert dans ce projet.
 
 ## Objectif du Projet
