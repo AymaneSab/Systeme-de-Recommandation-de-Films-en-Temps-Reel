@@ -2,6 +2,65 @@
 
 ![Alt text](https://maghreb.simplonline.co/_next/image?url=https%3A%2F%2Fsimplonline-v3-prod.s3.eu-west-3.amazonaws.com%2Fmedia%2Fimage%2Fpng%2Fcapture-656ca181b6f35308504279.png&w=1280&q=75)
 
+## Project Structure 
+```
+project-root/
+|-- .github/
+|   |-- workflows/
+|       |-- ci-cd.yml
+|
+|-- data/
+|   |-- MovieLens/
+|       |-- ml-.../ (Ensemble de données MovieLens)
+|
+|-- notebooks/
+|   |-- exploration.ipynb
+|
+|-- src/
+|   |-- preprocessing/
+|   |   |-- __init__.py
+|   |   |-- load_data.py
+|   |   |-- clean_data.py
+|   |   |-- feature_engineering.py
+|
+|   |-- model/
+|   |   |-- __init__.py
+|   |   |-- als_model.py
+|
+|   |-- elasticsearch/
+|   |   |-- __init__.py
+|   |   |-- create_indices.py
+|   |   |-- transform_data.py
+|   |   |-- ingest_data.py
+|
+|   |-- kibana/
+|   |   |-- __init__.py
+|   |   |-- create_dashboards.py
+|
+|   |-- flask_api/
+|   |   |-- __init__.py
+|   |   |-- app.py
+|
+|-- deployment/
+|   |-- Dockerfile
+|   |-- docker-compose.yml
+|
+|-- config/
+|   |-- spark_config.json
+|   |-- elasticsearch_config.json
+|
+|-- requirements.txt
+|-- README.md
+|-- .gitignore
+|-- venv/
+|-- tests/
+|   |-- test_preprocessing.py
+|   |-- test_model.py
+|   |-- test_elasticsearch.py
+|   |-- test_flask_api.py
+
+```
+
 ## Objectif du Projet
 
 Ce projet a pour objectif de concevoir une solution complète pour un système de recommandation de films en temps réel en utilisant des technologies telles qu'Apache Spark, Elasticsearch, Kibana et Flask. L'ensemble du processus couvre le traitement de données, l'apprentissage automatique, la visualisation et l'interaction via une API.
