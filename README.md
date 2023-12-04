@@ -1,76 +1,63 @@
 # Système de Recommandation de Films en Temps Réel
 
-Ce projet vise à créer un système de recommandation de films en temps réel en utilisant Apache Spark, Elasticsearch, Kibana et Flask pour offrir une expérience pratique dans le traitement de données, l'apprentissage automatique et la visualisation.
+Ce projet a pour objectif de concevoir un système de recommandation de films en temps réel en utilisant les technologies Apache Spark, Elasticsearch, Kibana et Flask. L'ensemble du processus, du prétraitement des données à la visualisation en passant par la construction du modèle de recommandation, est couvert dans ce projet.
 
-## Compréhension du Projet
+## Objectif du Projet
 
-### Objectif
-Se familiariser avec le but - créer un système de recommandation de films en temps réel et visualiser les données.
-
-### Ressources
-Examiner l'ensemble de données MovieLens.
+L'objectif principal de ce projet est de créer une solution robuste et évolutive pour offrir une expérience pratique dans le traitement de données, l'apprentissage automatique et la visualisation, tout en mettant en œuvre un système de recommandation de films en temps réel.
 
 ## Configuration de l'Environnement
 
-### Installation
-Installer et configurer Apache Spark, Elasticsearch, Kibana et Flask.
+### Installation des Technologies
+
+Assurez-vous d'installer et de configurer correctement les technologies nécessaires, notamment Apache Spark, Elasticsearch, Kibana et Flask. Les instructions détaillées peuvent être trouvées dans la documentation respective de chaque technologie.
 
 ### Acquisition des Données
-Télécharger l'ensemble de données MovieLens.
+
+Téléchargez l'ensemble de données MovieLens à partir de la source officielle. Cet ensemble de données servira de base pour la création du modèle de recommandation.
 
 ## Prétraitement des Données avec Apache Spark
 
-### Chargement des Données
-Charger l'ensemble de données MovieLens dans Spark.
+### Chargement et Nettoyage des Données
 
-### Nettoyage des Données
-Nettoyer et prétraiter les données (gestion des valeurs manquantes, conversion des types de données, diviser le champ des genres en une liste pour une meilleure analyse dans Elasticsearch).
+Utilisez Apache Spark pour charger l'ensemble de données MovieLens, nettoyer les données en gérant les valeurs manquantes et convertir les types de données au besoin.
 
 ### Ingénierie des Caractéristiques
-Créer les caractéristiques nécessaires pour le système de recommandation (mesure de l'activité de l'utilisateur, évaluations moyennes des films, fusionner les notes moyennes avec le DataFrame des films pour inclure les détails du film).
+
+Créez des caractéristiques pertinentes pour le système de recommandation, telles que la mesure de l'activité de l'utilisateur, les évaluations moyennes des films, et fusionnez ces données pour obtenir un DataFrame complet.
 
 ## Construction du Modèle de Recommandation
 
 ### Sélection du Modèle
-Choisir un modèle approprié pour les recommandations de films (par exemple, ALS model).
 
-### Entraînement du Modèle
-Former le modèle en utilisant le jeu de données préparé.
+Choisissez un modèle approprié pour les recommandations de films. Dans ce projet, l'utilisation du modèle ALS (Alternating Least Squares) est recommandée pour sa pertinence dans le domaine de la recommandation collaborative.
 
-### Évaluation du Modèle
-Évaluer les performances du modèle.
+### Entraînement et Évaluation du Modèle
+
+Entraînez le modèle en utilisant le jeu de données préparé et évaluez ses performances. L'objectif est d'obtenir un modèle de recommandation précis et fiable.
 
 ## Intégration des Données dans Elasticsearch
 
-### Création d'Indices
-Définir et créer des indices Elasticsearch pour les données de films et d'utilisateurs.
+### Création d'Indices et Ingestion des Données
 
-### Transformation des Données
-Transformer les données pour l'ingestion dans Elasticsearch.
-
-### Ingestion des Données
-Ingestion des données traitées dans Elasticsearch.
+Définissez et créez des indices Elasticsearch pour stocker les données de films et d'utilisateurs. Transformez ensuite les données prétraitées et effectuez l'ingestion dans Elasticsearch pour permettre une recherche rapide et efficace.
 
 ## Visualisation avec Kibana
 
 ### Création de Tableaux de Bord
-Créer des visualisations et des tableaux de bord dans Kibana basés sur les données Elasticsearch (par exemple, évaluations moyennes des films, niveaux d'activité des utilisateurs).
+
+Utilisez Kibana pour créer des visualisations et des tableaux de bord basés sur les données stockées dans Elasticsearch. Explorez des métriques telles que les évaluations moyennes des films et les niveaux d'activité des utilisateurs.
 
 ### Interprétation des Données
-Interpréter et expliquer les insights obtenus à partir des visualisations.
+
+Interprétez les données visualisées à l'aide de Kibana pour extraire des insights significatifs. Comprenez les tendances et les comportements des utilisateurs pour améliorer la qualité des recommandations.
 
 ## Développement de l'API Flask
 
-Développer une API qui reçoit le titre du film des utilisateurs. Étant donné que le modèle ALS nécessite un ID utilisateur pour générer des recommandations, vous devez rechercher les utilisateurs qui ont interagi avec le film spécifié, puis utiliser ces ID utilisateur pour obtenir des recommandations.
+### Création d'une API de Recommandation
+
+Développez une API Flask permettant aux utilisateurs de soumettre le titre d'un film. Utilisez les informations pour identifier les utilisateurs associés et générer des recommandations en temps réel à l'aide du modèle ALS.
 
 ## Déploiement
 
-Déployez l'application Flask sur un serveur Web ou une plateforme cloud. Vous pouvez utiliser des services tels que Heroku, ou une plate-forme similaire pour le déploiement.
-
-## Conformité au RGPD et Gouvernance des Données
-
-Assurer la conformité du système au RGPD, notamment en ce qui concerne le consentement des utilisateurs et la protection des données personnelles.
-
-Mettre en place des politiques de gouvernance des données pour assurer la qualité, la sécurité et l'intégrité des données.
-
-Développer et maintenir un catalogue de données détaillé pour une meilleure traçabilité et compréhension des sources de données.
+### Hébergement
