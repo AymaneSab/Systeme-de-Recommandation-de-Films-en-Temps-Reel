@@ -2,64 +2,73 @@
 
 ![Alt text](https://maghreb.simplonline.co/_next/image?url=https%3A%2F%2Fsimplonline-v3-prod.s3.eu-west-3.amazonaws.com%2Fmedia%2Fimage%2Fpng%2Fcapture-656ca181b6f35308504279.png&w=1280&q=75)
 
-Ce projet a pour objectif de concevoir un système de recommandation de films en temps réel en utilisant les technologies Apache Spark, Elasticsearch, Kibana et Flask. L'ensemble du processus, du prétraitement des données à la visualisation en passant par la construction du modèle de recommandation, est couvert dans ce projet.
-
 ## Objectif du Projet
 
-L'objectif principal de ce projet est de créer une solution robuste et évolutive pour offrir une expérience pratique dans le traitement de données, l'apprentissage automatique et la visualisation, tout en mettant en œuvre un système de recommandation de films en temps réel.
+Ce projet a pour objectif de concevoir une solution complète pour un système de recommandation de films en temps réel en utilisant des technologies telles qu'Apache Spark, Elasticsearch, Kibana et Flask. L'ensemble du processus couvre le traitement de données, l'apprentissage automatique, la visualisation et l'interaction via une API.
+
+## Compréhension du Projet
+
+### Objectif
+Le but ultime est de créer un système de recommandation de films hautement performant et en temps réel, offrant une expérience utilisateur optimale.
+
+### Ressources
+L'analyse sera basée sur l'ensemble de données MovieLens, une ressource bien établie pour de tels projets.
 
 ## Configuration de l'Environnement
 
-### Installation des Technologies
-
-Assurez-vous d'installer et de configurer correctement les technologies nécessaires, notamment Apache Spark, Elasticsearch, Kibana et Flask. Les instructions détaillées peuvent être trouvées dans la documentation respective de chaque technologie.
+### Installation
+Les technologies clés telles qu'Apache Spark, Elasticsearch, Kibana et Flask doivent être correctement installées et configurées.
 
 ### Acquisition des Données
-
-Téléchargez l'ensemble de données MovieLens à partir de la source officielle. Cet ensemble de données servira de base pour la création du modèle de recommandation.
+L'ensemble de données MovieLens doit être téléchargé et prêt pour l'analyse.
 
 ## Prétraitement des Données avec Apache Spark
 
-### Chargement et Nettoyage des Données
+### Chargement des Données
+L'ensemble de données MovieLens sera chargé dans Apache Spark pour une manipulation efficace et rapide.
 
-Utilisez Apache Spark pour charger l'ensemble de données MovieLens, nettoyer les données en gérant les valeurs manquantes et convertir les types de données au besoin.
+### Nettoyage des Données
+Les données seront nettoyées, gérant les valeurs manquantes et effectuant des conversions de types de données. Le champ des genres sera divisé en une liste pour une meilleure analyse dans Elasticsearch.
 
 ### Ingénierie des Caractéristiques
-
-Créez des caractéristiques pertinentes pour le système de recommandation, telles que la mesure de l'activité de l'utilisateur, les évaluations moyennes des films, et fusionnez ces données pour obtenir un DataFrame complet.
+Des caractéristiques pertinentes seront créées, telles que la mesure de l'activité de l'utilisateur, les évaluations moyennes des films, et les notes moyennes fusionnées avec le DataFrame des films pour inclure les détails du film.
 
 ## Construction du Modèle de Recommandation
 
 ### Sélection du Modèle
+Le modèle ALS (Alternating Least Squares) sera sélectionné pour son efficacité dans les recommandations de films.
 
-Choisissez un modèle approprié pour les recommandations de films. Dans ce projet, l'utilisation du modèle ALS (Alternating Least Squares) est recommandée pour sa pertinence dans le domaine de la recommandation collaborative.
-
-### Entraînement et Évaluation du Modèle
-
-Entraînez le modèle en utilisant le jeu de données préparé et évaluez ses performances. L'objectif est d'obtenir un modèle de recommandation précis et fiable.
+### Entraînement du Modèle
+Le modèle sera entraîné en utilisant le jeu de données préparé, suivi d'une évaluation approfondie de ses performances.
 
 ## Intégration des Données dans Elasticsearch
 
-### Création d'Indices et Ingestion des Données
+### Création d'Indices
+Des indices Elasticsearch seront définis et créés pour les données de films et d'utilisateurs.
 
-Définissez et créez des indices Elasticsearch pour stocker les données de films et d'utilisateurs. Transformez ensuite les données prétraitées et effectuez l'ingestion dans Elasticsearch pour permettre une recherche rapide et efficace.
+### Transformation des Données
+Les données seront transformées pour l'ingestion optimale dans Elasticsearch.
+
+### Ingestion des Données
+Les données traitées seront ingérées dans Elasticsearch pour permettre une recherche et une récupération efficaces.
 
 ## Visualisation avec Kibana
 
 ### Création de Tableaux de Bord
-
-Utilisez Kibana pour créer des visualisations et des tableaux de bord basés sur les données stockées dans Elasticsearch. Explorez des métriques telles que les évaluations moyennes des films et les niveaux d'activité des utilisateurs.
+Des tableaux de bord et des visualisations interactives seront créés dans Kibana, mettant en évidence des métriques telles que les évaluations moyennes des films et les niveaux d'activité des utilisateurs.
 
 ### Interprétation des Données
-
-Interprétez les données visualisées à l'aide de Kibana pour extraire des insights significatifs. Comprenez les tendances et les comportements des utilisateurs pour améliorer la qualité des recommandations.
+Des insights significatifs seront interprétés à partir des visualisations pour orienter les décisions stratégiques.
 
 ## Développement de l'API Flask
 
-### Création d'une API de Recommandation
-
-Développez une API Flask permettant aux utilisateurs de soumettre le titre d'un film. Utilisez les informations pour identifier les utilisateurs associés et générer des recommandations en temps réel à l'aide du modèle ALS.
+Une API robuste sera développée pour recevoir les titres de films des utilisateurs. Cette API recherchera les utilisateurs qui ont interagi avec le film spécifié, utilisant ces informations pour générer des recommandations de manière efficace.
 
 ## Déploiement
 
-### Hébergement
+L'application Flask sera déployée sur une plateforme cloud, garantissant une disponibilité maximale. Des services tels que Heroku peuvent être utilisés pour simplifier le processus de déploiement.
+
+## Conformité au RGPD et Gouvernance des Données
+
+La conformité au RGPD sera assurée, avec un accent particulier sur le consentement des utilisateurs et la protection des données personnelles. Des politiques de gouvernance des données seront mises en place pour garantir la qualité, la sécurité et l'intégrité des données. Un catalogue de données détaillé sera développé et maintenu pour une traçabilité et une compréhension optimales des sources de données.
+
