@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2 
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: fraude_detection_system_env
+          environment-file: 'project_env/env.yml'
+
+      - name: Install Dependencies
+        run: |
+          conda install --yes --file 'requirements.txt'
