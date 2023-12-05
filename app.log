@@ -1,0 +1,42 @@
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5002
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 115-888-144
+INFO:werkzeug: * Detected change in '/Users/sabri/Desktop/Study /Youcode/Github/Sprint_4/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data/APIProducer.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 115-888-144
+INFO:werkzeug: * Detected change in '/Users/sabri/Desktop/Study /Youcode/Github/Sprint_4/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data/APIProducer.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 115-888-144
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5002
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 115-888-144
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5002
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 115-888-144
+INFO:werkzeug:127.0.0.1 - - [05/Dec/2023 14:28:17] "GET /movie_data HTTP/1.1" 200 -
+INFO:root:Returned message: {"movie": {"movieId": "242", "title": "Kolya (1996)", "release_date": "24-Jan-1997", "video_release_date": NaN, "IMDb_URL": "http://us.imdb.com/M/title-exact?Kolya%20(1996)"}, "review": {"userId": "196", "movieId": "242", "rating": "3", "timestamp": "881250949"}, "user": {"userId": "196", "age": "49", "gender": "M", "occupation": "writer", "zipcode": "55105"}}
+INFO:root:Returned message: {"movie": {"movieId": "257", "title": "Men in Black (1997)", "release_date": "04-Jul-1997", "video_release_date": NaN, "IMDb_URL": "http://us.imdb.com/M/title-exact?Men+in+Black+(1997)"}, "review": {"userId": "196", "movieId": "257", "rating": "2", "timestamp": "881251577"}, "user": {"userId": "196", "age": "49", "gender": "M", "occupation": "writer", "zipcode": "55105"}}
+INFO:root:Returned message: {"movie": {"movieId": "111", "title": "Truth About Cats & Dogs, The (1996)", "release_date": "26-Apr-1996", "video_release_date": NaN, "IMDb_URL": "http://us.imdb.com/M/title-exact?Truth%20About%20Cats%20&%20Dogs,%20The%20(1996)"}, "review": {"userId": "196", "movieId": "111", "rating": "4", "timestamp": "881251793"}, "user": {"userId": "196", "age": "49", "gender": "M", "occupation": "writer", "zipcode": "55105"}}
+INFO:root:Returned message: {"movie": {"movieId": "25", "title": "Birdcage, The (1996)", "release_date": "08-Mar-1996", "video_release_date": NaN, "IMDb_URL": "http://us.imdb.com/M/title-exact?Birdcage,%20The%20(1996)"}, "review": {"userId": "196", "movieId": "25", "rating": "4", "timestamp": "881251955"}, "user": {"userId": "196", "age": "49", "gender": "M", "occupation": "writer", "zipcode": "55105"}}
+INFO:root:Returned message: {"movie": {"movieId": "382", "title": "Adventures of Priscilla, Queen of the Desert, The (1994)", "release_date": "01-Jan-1994", "video_release_date": NaN, "IMDb_URL": "http://us.imdb.com/M/title-exact?Adventures%20of%20Priscilla,%20Queen%20of%20the%20Desert,%20The%20(1994)"}, "review": {"userId": "196", "movieId": "382", "rating": "4", "timestamp": "881251843"}, "user": {"userId": "196", "age": "49", "gender": "M", "occupation": "writer", "zipcode": "55105"}}
+INFO:root:Returned message: {"movie": {"movieId": "202", "title": "Groundhog Day (1993)", "release_date": "01-Jan-1993", "video_release_date": NaN, "IMDb_URL": "http://us.imdb.com/M/title-exact?Groundhog%20Day%20(1993)"}, "review": {"userId": "196", "movieId": "202", "rating": "3", "timestamp": "881251728"}, "user": {"userId": "196", "age": "49", "gender": "M", "occupation": "writer", "zipcode": "55105"}}
+INFO:root:Returned message: {"movie": {"movieId": "153", "title": "Fish Called Wanda, A (1988)", "release_date": "01-Jan-1988", "video_release_date": NaN, "IMDb_URL": "http://us.imdb.com/M/title-exact?Fish%20Called%20Wanda,%20A%20(1988)"}, "review": {"userId": "196", "movieId": "153", "rating": "5", "timestamp": "881251820"}, "user": {"userId": "196", "age": "49", "gender": "M", "occupation": "writer", "zipcode": "55105"}}
+INFO:root:Returned message: {"movie": {"movieId": "286", "title": "English Patient, The (1996)", "release_date": "15-Nov-1996", "video_release_date": NaN, "IMDb_URL": "http://us.imdb.com/M/title-exact?English%20Patient,%20The%20(1996)"}, "review": {"userId": "196", "movieId": "286", "rating": "5", "timestamp": "881250949"}, "user": {"userId": "196", "age": "49", "gender": "M", "occupation": "writer", "zipcode": "55105"}}
+INFO:root:Returned message: {"movie": {"movieId": "66", "title": "While You Were Sleeping (1995)", "release_date": "01-Jan-1995", "video_release_date": NaN, "IMDb_URL": "http://us.imdb.com/M/title-exact?While%20You%20Were%20Sleeping%20(1995)"}, "review": {"userId": "196", "movieId": "66", "rating": "3", "timestamp": "881251911"}, "user": {"userId": "196", "age": "49", "gender": "M", "occupation": "writer", "zipcode": "55105"}}
+INFO:root:Returned message: {"movie": {"movieId": "845", "title": "That Thing You Do! (1996)", "release_date": "28-Sep-1996", "video_release_date": NaN, "IMDb_URL": "http://us.imdb.com/M/title-exact?That%20Thing%20You%20Do!%20(1996)"}, "review": {"userId": "196", "movieId": "845", "rating": "4", "timestamp": "881251954"}, "user": {"userId": "196", "age": "49", "gender": "M", "occupation": "writer", "zipcode": "55105"}}
+INFO:root:Returned message: {"movie": {"movieId": "173", "title": "Princess Bride, The (1987)", "release_date": "01-Jan-1987", "video_release_date": NaN, "IMDb_URL": "http://us.imdb.com/M/title-exact?Princess%20Bride,%20The%20(1987)"}, "review": {"userId": "196", "movieId": "173", "rating": "2", "timestamp": "881251820"}, "user": {"userId": "196", "age": "49", "gender": "M", "occupation": "writer", "zipcode": "55105"}}
+INFO:root:Returned message: {"movie": {"movieId": "238", "title": "Raising Arizona (1987)", "release_date": "01-Jan-1987", "video_release_date": NaN, "IMDb_URL": "http://us.imdb.com/M/title-exact?Raising%20Arizona%20(1987)"}, "review": {"userId": "196", "movieId": "238", "rating": "4", "timestamp": "881251820"}, "user": {"userId": "196", "age": "49", "gender": "M", "occupation": "writer", "zipcode": "55105"}}
+INFO:root:Returned message: {"movie": {"movieId": "94", "title": "Home Alone (1990)", "release_date": "01-Jan-1990", "video_release_date": NaN, "IMDb_URL": "http://us.imdb.com/M/title-exact?Home%20Alone%20(1990)"}, "review": {"userId": "196", "movieId": "94", "rating": "3", "timestamp": "881252172"}, "user": {"userId": "196", "age": "49", "gender": "M", "occupation": "writer", "zipcode": "55105"}}
+INFO:root:Returned message: {"movie": {"movieId": "762", "title": "Beautiful Girls (1996)", "release_date": "09-Feb-1996", "video_release_date": NaN, "IMDb_URL": "http://us.imdb.com/M/title-exact?Beautiful%20Girls%20(1996)"}, "review": {"userId": "196", "movieId": "762", "rating": "3", "timestamp": "881251955"}, "user": {"userId": "196", "age": "49", "gender": "M", "occupation": "writer", "zipcode": "55105"}}
+INFO:root:Returned message: {"movie": {"movieId": "381", "title": "Muriel's Wedding (1994)", "release_date": "01-Jan-1994", "video_release_date": NaN, "IMDb_URL": "http://us.imdb.com/M/title-exact?Muriel's%20Wedding%20(1994)"}, "review": {"userId": "196", "movieId": "381", "rating": "4", "timestamp": "881251728"}, "user": {"userId": "196", "age": "49", "gender": "M", "occupation": "writer", "zipcode": "55105"}}
