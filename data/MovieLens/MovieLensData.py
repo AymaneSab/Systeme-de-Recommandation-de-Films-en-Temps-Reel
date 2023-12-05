@@ -7,7 +7,7 @@ import json
 import os 
 from datetime import datetime 
 
-sys.path.append('/Users/sabri/Desktop/Study /Youcode/Github/Sprint_4/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data')
+sys.path.append('/home/hadoop/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data')
 
 app = Flask(__name__)
 
@@ -35,9 +35,9 @@ def setup_Api_logging():
 # Function to read data files
 def read_data_files():
     try:
-        u_data = pd.read_csv('/Users/sabri/Desktop/Study /Youcode/Github/Sprint_4/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data/MovieLens/RawData/u.data', sep='\t', names=['userId', 'movieId', 'rating', 'timestamp'])
-        u_item = pd.read_csv('/Users/sabri/Desktop/Study /Youcode/Github/Sprint_4/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data/MovieLens/RawData/u.item', sep='|', encoding='latin-1', header=None, names=['movieId', 'title', 'release_date', 'video_release_date', 'IMDb_URL', 'unknown', 'Action', 'Adventure', 'Animation', 'Children', 'Comedy', 'Crime', 'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War', 'Western'])
-        u_user = pd.read_csv('/Users/sabri/Desktop/Study /Youcode/Github/Sprint_4/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data/MovieLens/RawData/u.user', sep='|', names=['userId', 'age', 'gender', 'occupation', 'zipcode'])
+        u_data = pd.read_csv('/home/hadoop/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data/MovieLens/RawData/u.data', sep='\t', names=['userId', 'movieId', 'rating', 'timestamp'])
+        u_item = pd.read_csv('/home/hadoop/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data/MovieLens/RawData/u.item', sep='|', encoding='latin-1', header=None, names=['movieId', 'title', 'release_date', 'video_release_date', 'IMDb_URL', 'unknown', 'Action', 'Adventure', 'Animation', 'Children', 'Comedy', 'Crime', 'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War', 'Western'])
+        u_user = pd.read_csv('/home/hadoop/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data/MovieLens/RawData/u.user', sep='|', names=['userId', 'age', 'gender', 'occupation', 'zipcode'])
        
         return u_data, u_item, u_user
     
