@@ -1,3 +1,5 @@
 flask
 pandas
 python-confluent-kafka
+elasticsearch
+findspark
