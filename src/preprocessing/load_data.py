@@ -8,7 +8,9 @@ from confluent_kafka import Producer
 from confluent_kafka.admin import AdminClient, NewTopic
 from datetime import datetime
 import requests 
+from clean_data import clean_and_preprocess_movie_data , clean_and_preprocess_review_data , clean_and_preprocess_user_data
 
+# Setup Logging Function 
 def setup_logging(log_directory, logger_name):
     os.makedirs(log_directory, exist_ok=True)
 
@@ -28,8 +30,9 @@ def setup_logging(log_directory, logger_name):
     return logger
 
 def setup_KafkaLoader_logging():
-    return setup_logging("Log/API_KafkaLoader_LogFiles", "Loader")
+    return setup_logging("Log/API_KafkaLoader_LogFiles", "Api_Loader")
 
+# Function To Create Kakfa Topics 
 def create_kafka_topic(topic, admin_client, producer_logger):
     try:
         topic_spec = NewTopic(topic, num_partitions=1, replication_factor=1)
@@ -43,6 +46,7 @@ def create_kafka_topic(topic, admin_client, producer_logger):
         error_message = "Error creating Kafka topic: " + str(e)
         producer_logger.error(error_message)
 
+# Function To Ingest Data Into Kafka Topics 
 def produce_to_Topics(movieTopic, reviewTopic, userTopic,  producer_logger):
     try:
         producer = Producer({"bootstrap.servers": "localhost:9092"})  # Kafka broker address
@@ -57,23 +61,28 @@ def produce_to_Topics(movieTopic, reviewTopic, userTopic,  producer_logger):
                     if line:
                         if line :
                             json_data = json.loads(line)
+                            producer_logger.info(f"MData {json_data}")
                             
                             # Access movie, review, and user data separately
                             movie_data = json_data['movie']
                             review_data = json_data['review']
                             user_data = json_data['user']
 
+                            treated_movie_data   = clean_and_preprocess_movie_data(movie_data)
+                            treeated_review_data = clean_and_preprocess_review_data(review_data)
+                            treated_user_data    = clean_and_preprocess_user_data(user_data)
+
                             try:
                                 # Insert To Review Topic 
-                                producer.produce(movieTopic, key="movie", value=json.dumps(movie_data))
+                                producer.produce(movieTopic, key="movie", value=json.dumps(treated_movie_data))
                                 producer_logger.info(f"Movie Produced Successfully to {topic1}: ")
 
                                 # Insert to Movie Topic 
-                                producer.produce(reviewTopic, key="review", value=json.dumps(review_data))
+                                producer.produce(reviewTopic, key="review", value=json.dumps(treeated_review_data))
                                 producer_logger.info(f"Review Produced Successfully to {topic2}: ")
 
                                 # Insert To User Topic 
-                                producer.produce(userTopic, key="review", value=json.dumps(user_data))
+                                producer.produce(userTopic, key="review", value=json.dumps(treated_user_data))
                                 producer_logger.info(f"User Produced Successfully to {topic2}: ")
 
                                 # Flush only if everything is successful
@@ -93,6 +102,7 @@ def produce_to_Topics(movieTopic, reviewTopic, userTopic,  producer_logger):
         error_message = "Error In Kafka Connection  " + str(e)
         producer_logger.error(error_message)
 
+# Exemple Usage
 def runKafkaProducer(topic1, topic2 , topic3):
     
     producer_logger = setup_KafkaLoader_logging()
