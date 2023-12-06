@@ -1,5 +1,6 @@
 {
     "python.analysis.extraPaths": [
-        "./data/MovieLens"
+        "./data/MovieLens",
+        "./data/MovieLens/RawData/"
     ]
 }
