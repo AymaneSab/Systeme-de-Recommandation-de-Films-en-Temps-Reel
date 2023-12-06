@@ -1,4 +1,5 @@
-jsonschema
 flask
-pylint
-schedule
+pandas
+python-confluent-kafka
+elasticsearch
+findspark

@@ -1,14 +1,13 @@
-import sys
 import os
 import json
 import logging
-import time
 from datetime import datetime 
 from confluent_kafka import Producer
 from confluent_kafka.admin import AdminClient, NewTopic
 from datetime import datetime
 import requests 
 
+# Setup Logging Function 
 def setup_logging(log_directory, logger_name):
     os.makedirs(log_directory, exist_ok=True)
 
@@ -28,8 +27,9 @@ def setup_logging(log_directory, logger_name):
     return logger
 
 def setup_KafkaLoader_logging():
-    return setup_logging("Log/API_KafkaLoader_LogFiles", "Loader")
+    return setup_logging("Log/API_KafkaLoader_LogFiles", "Api_Loader")
 
+# Function To Create Kakfa Topics 
 def create_kafka_topic(topic, admin_client, producer_logger):
     try:
         topic_spec = NewTopic(topic, num_partitions=1, replication_factor=1)
@@ -43,6 +43,7 @@ def create_kafka_topic(topic, admin_client, producer_logger):
         error_message = "Error creating Kafka topic: " + str(e)
         producer_logger.error(error_message)
 
+# Function To Ingest Data Into Kafka Topics 
 def produce_to_Topics(movieTopic, reviewTopic, userTopic,  producer_logger):
     try:
         producer = Producer({"bootstrap.servers": "localhost:9092"})  # Kafka broker address
@@ -66,15 +67,15 @@ def produce_to_Topics(movieTopic, reviewTopic, userTopic,  producer_logger):
                             try:
                                 # Insert To Review Topic 
                                 producer.produce(movieTopic, key="movie", value=json.dumps(movie_data))
-                                producer_logger.info(f"Movie Produced Successfully to {topic1}: ")
+                                producer_logger.info(f"Movie Produced Successfully to {movieTopic}  ------ {movie_data}: ")
 
                                 # Insert to Movie Topic 
                                 producer.produce(reviewTopic, key="review", value=json.dumps(review_data))
-                                producer_logger.info(f"Review Produced Successfully to {topic2}: ")
+                                producer_logger.info(f"Review Produced Successfully to {reviewTopic} ------ {review_data} : ")
 
                                 # Insert To User Topic 
-                                producer.produce(userTopic, key="review", value=json.dumps(user_data))
-                                producer_logger.info(f"User Produced Successfully to {topic2}: ")
+                                producer.produce(userTopic, key="user", value=json.dumps(user_data))
+                                producer_logger.info(f"User Produced Successfully to {userTopic}   ------ {user_data}: ")
 
                                 # Flush only if everything is successful
                                 producer.flush()
@@ -93,6 +94,7 @@ def produce_to_Topics(movieTopic, reviewTopic, userTopic,  producer_logger):
         error_message = "Error In Kafka Connection  " + str(e)
         producer_logger.error(error_message)
 
+# Exemple Usage
 def runKafkaProducer(topic1, topic2 , topic3):
     
     producer_logger = setup_KafkaLoader_logging()
@@ -106,6 +108,7 @@ def runKafkaProducer(topic1, topic2 , topic3):
         # Check if the topics exist, and create them if not
         for topic in [topic1, topic2 , topic3 ]:
             existing_topics = admin_client.list_topics().topics
+            
             if topic not in existing_topics:
                 create_kafka_topic(topic, admin_client, producer_logger)
 
