@@ -6,7 +6,6 @@ from confluent_kafka import Producer
 from confluent_kafka.admin import AdminClient, NewTopic
 from datetime import datetime
 import requests 
-from clean_data import clean_and_preprocess_movie_data , clean_and_preprocess_review_data , clean_and_preprocess_user_data
 
 # Setup Logging Function 
 def setup_logging(log_directory, logger_name):
@@ -65,22 +64,18 @@ def produce_to_Topics(movieTopic, reviewTopic, userTopic,  producer_logger):
                             review_data = json_data['review']
                             user_data = json_data['user']
 
-                            treated_movie_data   = clean_and_preprocess_movie_data(movie_data)
-                            treeated_review_data = clean_and_preprocess_review_data(review_data)
-                            treated_user_data    = clean_and_preprocess_user_data(user_data)
-
                             try:
                                 # Insert To Review Topic 
-                                producer.produce(movieTopic, key="movie", value=json.dumps(treated_movie_data))
-                                producer_logger.info(f"Movie Produced Successfully to {topic1}  ------ {treated_movie_data}: ")
+                                producer.produce(movieTopic, key="movie", value=json.dumps(movie_data))
+                                producer_logger.info(f"Movie Produced Successfully to {movieTopic}  ------ {movie_data}: ")
 
                                 # Insert to Movie Topic 
-                                producer.produce(reviewTopic, key="review", value=json.dumps(treeated_review_data))
-                                producer_logger.info(f"Review Produced Successfully to {topic2} ------ {treeated_review_data} : ")
+                                producer.produce(reviewTopic, key="review", value=json.dumps(review_data))
+                                producer_logger.info(f"Review Produced Successfully to {reviewTopic} ------ {review_data} : ")
 
                                 # Insert To User Topic 
-                                producer.produce(userTopic, key="review", value=json.dumps(treated_user_data))
-                                producer_logger.info(f"User Produced Successfully to {topic2}   ------ {treated_user_data}: ")
+                                producer.produce(userTopic, key="user", value=json.dumps(user_data))
+                                producer_logger.info(f"User Produced Successfully to {userTopic}   ------ {user_data}: ")
 
                                 # Flush only if everything is successful
                                 producer.flush()
