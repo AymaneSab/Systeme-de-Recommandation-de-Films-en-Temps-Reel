@@ -34,7 +34,6 @@ def setup_logging(log_directory, logger_name):
 
     return logger
 
-
 def setup_Api_logging():
     return setup_logging("Log/API_Movies_LogFiles", "API_logger")
 
