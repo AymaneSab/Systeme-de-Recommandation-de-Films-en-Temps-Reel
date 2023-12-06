@@ -8,7 +8,7 @@ import os
 import threading
 from uuid import uuid4
 from elasticsearch import Elasticsearch
-from elasticsearch_sender import elastic_setup_logging , connectToelastic , createMovieIndex , createReviewsIndex
+from create_indices import elastic_setup_logging , connectToelastic , createMovieIndex , createReviewsIndex , createUserIndex
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, expr, from_json
@@ -58,20 +58,13 @@ def sparkTreatment_movies(topicname, kafka_bootstrap_servers , consumer_logger):
 
         # Define the schema for Kafka messages
         kafka_schema = StructType([
-            StructField("adult", BooleanType(), True),
-            StructField("backdrop_path", StringType(), True),
-            StructField("genre_ids", ArrayType(IntegerType()), True),
-            StructField("id", IntegerType(), True),
-            StructField("original_language", StringType(), True),
-            StructField("original_title", StringType(), True),
-            StructField("overview", StringType(), True),
-            StructField("popularity", FloatType(), True),
-            StructField("poster_path", StringType(), True),
-            StructField("release_date", DateType(), True),
+            StructField("movieId", StringType(), True),
             StructField("title", StringType(), True),
-            StructField("video", BooleanType(), True),
-            StructField("vote_average", FloatType(), True),
-            StructField("vote_count", IntegerType(), True)
+            StructField("release_date", StringType(), True),  # Assuming release_date in string format
+            StructField("video_release_date", StringType(), True),  # Assuming video_release_date in string format
+            StructField("IMDb_URL", StringType(), True),
+            StructField("movie_average_rating", FloatType(), True),
+
         ])
 
         # Read data from Kafka topic with defined schema
@@ -87,15 +80,6 @@ def sparkTreatment_movies(topicname, kafka_bootstrap_servers , consumer_logger):
 
         consumer_logger.info("----------> Kafka Stream Data Loaded Successfully")
 
-        # Perform transformations
-        enriched_df = kafka_stream_df.withColumn("description", expr("concat(title, ' - ', overview)"))
-
-        normalized_df = enriched_df.withColumn("normalized_vote_average", col("vote_average") / 10.0)
-
-        transformed_df = normalized_df.withColumn("release_date", date_format(col("release_date"), "yyyy-MM-dd").cast("date"))
-
-        #flattened_df = transformed_df.withColumn("genre_id", expr("explode(genre_ids)")).drop("genre_ids")
-
         checkpoint_location = "Elasticsearch/Checkpoint/Movies"
 
         if not os.path.exists(checkpoint_location):
@@ -109,7 +93,7 @@ def sparkTreatment_movies(topicname, kafka_bootstrap_servers , consumer_logger):
         createMovieIndex(es , elastic_logger)
 
         # Write to Elasticsearch
-        transformed_df.writeStream \
+        kafka_stream_df.writeStream \
             .format("org.elasticsearch.spark.sql") \
             .outputMode("append") \
             .option("es.nodes", "localhost") \
@@ -133,19 +117,12 @@ def sparkTreatment_reviews(topicname, kafka_bootstrap_servers , consumer_logger)
 
         consumer_logger.info("----------> Packages Loaded Successfully ")
 
+        # Define the schema for Kafka messages
         kafka_schema = StructType([
-            StructField("author", StringType(), True),
-            StructField("author_details", StructType([
-                StructField("name", StringType(), True),
-                StructField("username", StringType(), True),
-                StructField("avatar_path", StringType(), True),
-                StructField("rating", DoubleType(), True)
-            ]), True),
-            StructField("content", StringType(), True),
-            StructField("created_at", StringType(), True),
-            StructField("id", StringType(), True),
-            StructField("updated_at", StringType(), True),
-            StructField("url", StringType(), True)
+            StructField("userId", StringType(), True),
+            StructField("movieId", StringType(), True),
+            StructField("rating", StringType(), True),
+            StructField("timestamp", StringType(), True),
         ])
 
         # Read data from Kafka topic with defined schema
@@ -191,19 +168,15 @@ def sparkTreatment_user(topicname, kafka_bootstrap_servers , consumer_logger):
 
         consumer_logger.info("----------> Packages Loaded Successfully ")
 
+        # Define the schema for Kafka messages
         kafka_schema = StructType([
-            StructField("author", StringType(), True),
-            StructField("author_details", StructType([
-                StructField("name", StringType(), True),
-                StructField("username", StringType(), True),
-                StructField("avatar_path", StringType(), True),
-                StructField("rating", DoubleType(), True)
-            ]), True),
-            StructField("content", StringType(), True),
-            StructField("created_at", StringType(), True),
-            StructField("id", StringType(), True),
-            StructField("updated_at", StringType(), True),
-            StructField("url", StringType(), True)
+            StructField("userId", StringType(), True),
+            StructField("age", StringType(), True),
+            StructField("gender", StringType(), True),
+            StructField("occupation", StringType(), True),
+            StructField("zipcode", StringType(), True),
+            StructField("user_activity", FloatType(), True),
+
         ])
 
         # Read data from Kafka topic with defined schema
@@ -224,7 +197,7 @@ def sparkTreatment_user(topicname, kafka_bootstrap_servers , consumer_logger):
 
         es = connectToelastic(elastic_logger)
 
-        createReviewsIndex(es , elastic_logger)
+        createUserIndex(es , elastic_logger)
 
         # Write to Elasticsearch
         df.writeStream \
