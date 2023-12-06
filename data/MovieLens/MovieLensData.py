@@ -7,7 +7,12 @@ import json
 import os 
 from datetime import datetime 
 
-sys.path.append('/home/hadoop/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data')
+# Assuming your RawData directory is under the current working directory
+raw_data_directory = '/home/hadoop/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data/MovieLens/RawData'
+
+u_data_path = os.path.join(raw_data_directory, 'u.data')
+u_item_path = os.path.join(raw_data_directory, 'u.item')
+u_user_path = os.path.join(raw_data_directory, 'u.user')
 
 app = Flask(__name__)
 
@@ -29,15 +34,16 @@ def setup_logging(log_directory, logger_name):
 
     return logger
 
+
 def setup_Api_logging():
-    return setup_logging("Log/API_Movies_LogFiles", "customers_logger")
+    return setup_logging("Log/API_Movies_LogFiles", "API_logger")
 
 # Function to read data files
 def read_data_files():
     try:
-        u_data = pd.read_csv('/home/hadoop/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data/MovieLens/RawData/u.data', sep='\t', names=['userId', 'movieId', 'rating', 'timestamp'])
-        u_item = pd.read_csv('/home/hadoop/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data/MovieLens/RawData/u.item', sep='|', encoding='latin-1', header=None, names=['movieId', 'title', 'release_date', 'video_release_date', 'IMDb_URL', 'unknown', 'Action', 'Adventure', 'Animation', 'Children', 'Comedy', 'Crime', 'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War', 'Western'])
-        u_user = pd.read_csv('/home/hadoop/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data/MovieLens/RawData/u.user', sep='|', names=['userId', 'age', 'gender', 'occupation', 'zipcode'])
+        u_data = pd.read_csv(u_data_path, sep='\t', names=['userId', 'movieId', 'rating', 'timestamp'])
+        u_item = pd.read_csv(u_item_path, sep='|', encoding='latin-1', header=None, names=['movieId', 'title', 'release_date', 'video_release_date', 'IMDb_URL', 'unknown', 'Action', 'Adventure', 'Animation', 'Children', 'Comedy', 'Crime', 'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War', 'Western'])
+        u_user = pd.read_csv(u_user_path, sep='|', names=['userId', 'age', 'gender', 'occupation', 'zipcode'])
        
         return u_data, u_item, u_user
     
@@ -105,6 +111,7 @@ def get_movie_data():
                 logging.info(f"Returned message: {json_data}")
 
         return app.response_class(generate(), content_type='application/json')
+    
     except Exception as e:
         logging.error(f"Error processing request: {e}")
         return jsonify({"error": "Internal Server Error"}), 500
