@@ -42,9 +42,10 @@ def createMovieIndex(esconnection, elastic_logger):
             "properties": {
                 "movieId": {"type": "keyword"},
                 "title": {"type": "text"},
-                "release_date": {"type": "date"},
-                "video_release_date": {"type": "date"},
-                "IMDb_URL": {"type": "keyword"}
+                "release_date": {"type": "text"},
+                "video_release_date": {"type": "text"},
+                "IMDb_URL": {"type": "keyword"},
+                "movie_average_rating": {"type": "float"}  
             }
         }
     }
@@ -52,6 +53,7 @@ def createMovieIndex(esconnection, elastic_logger):
     try:
         esconnection.indices.create(index="movie", body=my_index_body)
         elastic_logger.info("Index 'movie' created successfully.")
+        
     except RequestError as e:
         if "resource_already_exists_exception" in str(e):
             elastic_logger.info("Index 'movie' already exists.")
@@ -70,7 +72,7 @@ def createReviewsIndex(esconnection, elastic_logger):
             "properties": {
                 "userId": {"type": "keyword"},
                 "movieId": {"type": "keyword"},
-                "rating": {"type": "text"},  # Change the type to match your actual data type
+                "rating": {"type": "float"},  # Change the type to match your actual data type
                 "timestamp": {"type": "text"}  # Change the type to match your actual data type
             }
         }
@@ -99,7 +101,8 @@ def createUserIndex(esconnection, elastic_logger):
                 "age": {"type": "keyword"},
                 "gender": {"type": "text"},
                 "occupation": {"type": "text"},
-                "zipcode": {"type": "text"}
+                "zipcode": {"type": "text"},
+                "user_activity": {"type": "float"} 
             }
         }
     }
