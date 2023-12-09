@@ -1,6 +1,5 @@
 from flask import Flask, jsonify 
 import pandas as pd
-import sys
 import time
 import logging
 import json
@@ -53,7 +52,7 @@ def read_data_files():
 # Function to extract genres for each movie
 def extract_genres(row):
     genres = ['unknown', 'Action', 'Adventure', 'Animation', 'Children', 'Comedy', 'Crime', 'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War', 'Western']
-    movie_genres = [genre for genre, val in zip(genres, row[5:]) if val == 1]
+    movie_genres = [genre for genre, val in zip(genres, row[4:]) if val == 1]
     return movie_genres
 
 # Function to create JSON entry
@@ -62,7 +61,7 @@ def create_json_entry(row):
         'movieId': str(row['movieId']),
         'title': row['title'],
         'release_date': row['release_date'],
-        'video_release_date': row['video_release_date'],
+        'genres': row['genres'],  # Include the genres list
         'IMDb_URL': row['IMDb_URL']
     }
 
@@ -98,7 +97,7 @@ def get_movie_data():
         u_item['genres'] = u_item.apply(extract_genres, axis=1)
 
         # Merge relevant data
-        merged_data = pd.merge(u_data, u_item[['movieId', 'title', 'release_date', 'video_release_date', 'IMDb_URL']], on='movieId')
+        merged_data = pd.merge(u_data, u_item[['movieId', 'title', 'release_date', 'genres', 'IMDb_URL']], on='movieId')
         merged_data = pd.merge(merged_data, u_user[['userId', 'age', 'gender', 'occupation', 'zipcode']], on='userId')
 
         # Convert to JSON format and return as a streaming response with a delay
