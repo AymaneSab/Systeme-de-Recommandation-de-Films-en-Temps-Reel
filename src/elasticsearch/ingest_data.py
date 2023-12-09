@@ -16,7 +16,7 @@ from pyspark.sql import functions as F
 from create_indices import connectToelastic, createMovieIndex, createReviewsIndex, createUserIndex
 from clean_data import clean_and_preprocess_movie_data, clean_and_preprocess_review_data, clean_and_preprocess_user_data
 
-from feature_engineering import calculate_user_average 
+from feature_engineering import calculate_user_average  , calculate_movie_rating_average
 
 def setup_logging(log_directory, logger_name):
     os.makedirs(log_directory, exist_ok=True)
@@ -98,32 +98,32 @@ def sparkTreatment_movies(topicname, kafka_bootstrap_servers , spark_logger , mo
         
         movies_logger.info(f"Data Loaded From {topicname} Topic Succefully ")
         
-        treated_movie = clean_and_preprocess_movie_data(kafka_stream_df)
+        try :
 
-        movies_logger.info("Data Treated Succefully ")
+            treated_users = clean_and_preprocess_movie_data(kafka_stream_df)
+            movies_logger.info("Transformation Succefull")
 
-        es = connectToelastic(movies_logger)
-
-        createMovieIndex(es , movies_logger)
-
-        movies_logger.info("Movie Index Created Succefully")
+        except Exception as e :
+            movies_logger.error(f"Transformation Failed {str(e)}")
 
         checkpoint_location = "Elasticsearch/Checkpoint/Movies"
 
         if not os.path.exists(checkpoint_location):
             os.makedirs(checkpoint_location)
 
+        es = connectToelastic(user_logger)
+
+        createMovieIndex(es, user_logger)
+
         # Write to Elasticsearch
-        treated_movie.writeStream \
-            .format("org.elasticsearch.spark.sql") \
+        query = treated_users.writeStream \
             .outputMode("append") \
-            .option("es.nodes", "localhost") \
-            .option("es.port", "9200") \
-            .option("es.resource", "movie/_doc") \
             .option("checkpointLocation", checkpoint_location) \
-            .start().awaitTermination()
-        
-        movies_logger.info("treated_movie Sended To Elastic ")
+            .foreachBatch(lambda df, epoch_id: write_movie_to_elasticsearch(df, epoch_id, col("movieId") ,spark, movies_logger)) \
+            .start()
+
+        query.awaitTermination()
+        movies_logger.info("treated_users Sent To Elastic ")
 
 
     except Exception as e:
@@ -133,7 +133,25 @@ def sparkTreatment_movies(topicname, kafka_bootstrap_servers , spark_logger , mo
         # Stop SparkSession
         spark.stop()
         movies_logger.info("----------> SparkSession Stopped")
-        
+
+def write_movie_to_elasticsearch(df, epoch_id,movieId, session, logger):
+    try:
+        calculate_movie_average_udf = lambda movieId: calculate_movie_rating_average(movieId, session, user_logger)
+
+        treated_users = df.withColumn('movie_average_rating', lit(calculate_movie_average_udf(movieId)))
+        # Write the batch data to Elasticsearch
+        treated_users.write \
+            .format("org.elasticsearch.spark.sql") \
+            .option("es.nodes", "localhost") \
+            .option("es.port", "9200") \
+            .option("es.resource", "movie/_doc") \
+            .mode("append") \
+            .save()
+
+    except Exception as e:
+        # Handle the exception (print or log the error message)
+        logger.error(f"Error in write_to_elasticsearch: {str(e)}")
+
 def sparkTreatment_reviews(topicname, kafka_bootstrap_servers , spark_logger , review_logger):
     try:
 
@@ -193,7 +211,7 @@ def sparkTreatment_reviews(topicname, kafka_bootstrap_servers , spark_logger , r
 def sparkTreatment_user(topicname, kafka_bootstrap_servers, spark_logger, user_logger):
     try:
         # Initialize Spark session
-        session = SparkSession.builder.appName("YourAppName").getOrCreate()
+        session =  sparkSessionInitialiser(spark_logger)
         user_logger.info("----------> Packages Loaded Successfully ")
 
         # Define the schema for Kafka messages
@@ -236,7 +254,7 @@ def sparkTreatment_user(topicname, kafka_bootstrap_servers, spark_logger, user_l
         query = treated_users.writeStream \
             .outputMode("append") \
             .option("checkpointLocation", checkpoint_location) \
-            .foreachBatch(lambda df, epoch_id: write_to_elasticsearch(df, epoch_id, col("userId") ,session, user_logger)) \
+            .foreachBatch(lambda df, epoch_id: write_user_to_elasticsearch(df, epoch_id, col("userId") ,session, user_logger)) \
             .start()
 
         query.awaitTermination()
@@ -249,7 +267,7 @@ def sparkTreatment_user(topicname, kafka_bootstrap_servers, spark_logger, user_l
     finally:
         session.stop()
 
-def write_to_elasticsearch(df, epoch_id,userId, session, logger):
+def write_user_to_elasticsearch(df, epoch_id,userId, session, logger):
     try:
         calculate_user_average_udf = lambda user_id: calculate_user_average(userId, session, user_logger)
 
