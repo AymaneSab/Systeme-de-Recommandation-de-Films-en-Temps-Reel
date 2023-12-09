@@ -1,4 +1,7 @@
 from pyspark.sql.functions import col, lit, from_unixtime, coalesce , to_date , date_format
+from pyspark.sql.functions import udf
+from pyspark.sql.types import StringType
+
 
 def clean_and_preprocess_movie_data(kafka_stream_df):
     try:
@@ -11,7 +14,7 @@ def clean_and_preprocess_movie_data(kafka_stream_df):
         # Convert 'release_date' and 'video_release_date' to datetime objects
         # Convert 'release_date' and 'video_release_date' to datetime objects, with fallback to the original value on failure
         transformed_df = transformed_df.withColumn("release_date", coalesce(to_date("release_date", 'yyyy-MM-dd'), col("release_date")))
-        transformed_df = transformed_df.withColumn("video_release_date", coalesce(to_date("video_release_date", 'yyyy-MM-dd'), col("video_release_date")))
+        transformed_df = transformed_df.withColumn("genres",  col("genres").cast("string"))
 
 
         transformed_df = transformed_df.withColumn("IMDb_URL", coalesce("IMDb_URL", lit("No Image Provided")))
@@ -65,7 +68,7 @@ def clean_and_preprocess_user_data(kafka_stream_df):
         transformed_df = transformed_df.withColumn("userId", col("userId").cast("string"))
 
         # Add a new field 'user_activity' with a default value of 1.0
-        transformed_df = transformed_df.withColumn("user_activity", lit(1.0).cast("float"))
+        transformed_df = transformed_df.withColumn("user_activity", lit(1.0).cast("float"))    
 
         return transformed_df
 
