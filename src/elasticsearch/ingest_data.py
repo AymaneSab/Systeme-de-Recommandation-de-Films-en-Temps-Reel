@@ -2,18 +2,21 @@ import findspark
 findspark.init()
 
 import logging
-import os
 from datetime import datetime
 import threading
-
-from create_indices import elastic_setup_logging, connectToelastic, createMovieIndex, createReviewsIndex, createUserIndex
-
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import from_json, explode, date_format, to_date
-from pyspark.sql.types import StructType, StructField, StringType, ArrayType, FloatType
+from pyspark.sql.types import StructType, StructField, StringType, ArrayType, FloatType , IntegerType
+from pyspark.sql.streaming import StreamingQueryException
+import os 
+import sys 
+import pandas as pd
 
+from pyspark.sql.functions import col,from_json, explode , lit
+from pyspark.sql import functions as F
+from create_indices import connectToelastic, createMovieIndex, createReviewsIndex, createUserIndex
 from clean_data import clean_and_preprocess_movie_data, clean_and_preprocess_review_data, clean_and_preprocess_user_data
 
+from feature_engineering import calculate_user_average 
 
 def setup_logging(log_directory, logger_name):
     os.makedirs(log_directory, exist_ok=True)
@@ -34,19 +37,19 @@ def setup_logging(log_directory, logger_name):
     return logger
 
 def setup_sparkSessionInitialiser_logging():
-    return setup_logging("Log/Data_Ingest", "sparkSessionInitialiser")
+    return setup_logging("Log/Spark", "sparkSessionInitialiser")
 
 def setup_main_logging():
-    return setup_logging("Log/Data_Ingest", "main")
+    return setup_logging("Log/Main_Script", "main")
 
 def setup_sparkTreatment_movies_logging():
-    return setup_logging("Log/Data_Ingest", "sparkTreatment_movies")
+    return setup_logging("Log/Kafka_Movies_Insertion", "sparkTreatment_movies")
 
 def setup_sparkTreatment_reviews_logging():
-    return setup_logging("Log/Data_Ingest", "sparkTreatment_reviews_")
+    return setup_logging("Log/Kafka_Reviews_Insertion", "sparkTreatment_reviews_")
 
 def setup_sparkTreatment_user_logging():
-    return setup_logging("Log/Data_Ingest", "sparkTreatment_user")
+    return setup_logging("Log/Kafka_User_Insertion", "sparkTreatment_user")
 
 def sparkSessionInitialiser(logger):
 
@@ -78,7 +81,7 @@ def sparkTreatment_movies(topicname, kafka_bootstrap_servers , spark_logger , mo
             StructField("movieId", StringType(), True),
             StructField("title", StringType(), True),
             StructField("release_date", StringType(), True),  
-            StructField("video_release_date", StringType(), True),  
+            StructField("genres", ArrayType(StringType()), True),  
             StructField("IMDb_URL", StringType(), True),
         ])
 
@@ -187,11 +190,10 @@ def sparkTreatment_reviews(topicname, kafka_bootstrap_servers , spark_logger , r
     finally:
         spark.stop()
 
-def sparkTreatment_user(topicname, kafka_bootstrap_servers , spark_logger , user_logger):
+def sparkTreatment_user(topicname, kafka_bootstrap_servers, spark_logger, user_logger):
     try:
-
-        spark = sparkSessionInitialiser(spark_logger)
-
+        # Initialize Spark session
+        session = SparkSession.builder.appName("YourAppName").getOrCreate()
         user_logger.info("----------> Packages Loaded Successfully ")
 
         # Define the schema for Kafka messages
@@ -204,7 +206,7 @@ def sparkTreatment_user(topicname, kafka_bootstrap_servers , spark_logger , user
         ])
 
         # Read data from Kafka topic with defined schema
-        df = spark \
+        df = session \
             .readStream \
             .format("kafka") \
             .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
@@ -213,8 +215,14 @@ def sparkTreatment_user(topicname, kafka_bootstrap_servers , spark_logger , user
             .selectExpr("CAST(value AS STRING)") \
             .select(explode(from_json("value", ArrayType(kafka_schema))).alias("data")) \
             .select("data.*")
-        
-        treated_users = clean_and_preprocess_user_data(df)
+
+        try :
+
+            treated_users = clean_and_preprocess_user_data(df)
+            user_logger.info("Transformation Succefull")
+
+        except Exception as e :
+            user_logger.error(f"Transformation Failed {str(e)}")
 
         checkpoint_location = "Elasticsearch/Checkpoint/Users"
 
@@ -222,25 +230,42 @@ def sparkTreatment_user(topicname, kafka_bootstrap_servers , spark_logger , user
             os.makedirs(checkpoint_location)
 
         es = connectToelastic(user_logger)
-
-        createUserIndex(es , user_logger)
+        createUserIndex(es, user_logger)
 
         # Write to Elasticsearch
-        treated_users.writeStream \
-            .format("org.elasticsearch.spark.sql") \
+        query = treated_users.writeStream \
             .outputMode("append") \
-            .option("es.nodes", "localhost") \
-            .option("es.port", "9200") \
-            .option("es.resource", "user/_doc") \
             .option("checkpointLocation", checkpoint_location) \
-            .start().awaitTermination()
+            .foreachBatch(lambda df, epoch_id: write_to_elasticsearch(df, epoch_id, col("userId") ,session, user_logger)) \
+            .start()
 
-        user_logger.info("treated_users Sended To Elastic ")
+        query.awaitTermination()
+        user_logger.info("treated_users Sent To Elastic ")
 
+    except StreamingQueryException as sqe:
+        user_logger.error(f"Streaming query exception: {str(sqe)}")
     except Exception as e:
         user_logger.error(f"An error occurred: {str(e)}")
     finally:
-        spark.stop()
+        session.stop()
+
+def write_to_elasticsearch(df, epoch_id,userId, session, logger):
+    try:
+        calculate_user_average_udf = lambda user_id: calculate_user_average(userId, session, user_logger)
+
+        treated_users = df.withColumn('user_activity', lit(calculate_user_average_udf(userId)))
+        # Write the batch data to Elasticsearch
+        treated_users.write \
+            .format("org.elasticsearch.spark.sql") \
+            .option("es.nodes", "localhost") \
+            .option("es.port", "9200") \
+            .option("es.resource", "user/_doc") \
+            .mode("append") \
+            .save()
+
+    except Exception as e:
+        # Handle the exception (print or log the error message)
+        logger.error(f"Error in write_to_elasticsearch: {str(e)}")
 
 def runSparkTreatment(spark_logger , movies_logger , review_logger , user_logger , main_loggin):
 
@@ -267,11 +292,11 @@ def runSparkTreatment(spark_logger , movies_logger , review_logger , user_logger
         main_loggin.exception("An unexpected error occurred in Spark")
 
 
-spark_logger = setup_sparkSessionInitialiser_logging()
+spark_logger = setup_sparkSessionInitialiser_logging()  
 movies_logger = setup_sparkTreatment_movies_logging()
 review_logger = setup_sparkTreatment_reviews_logging()
 user_logger = setup_sparkTreatment_user_logging()
 main_loggin = setup_main_logging()
 
 
-runSparkTreatment()
+runSparkTreatment(spark_logger , movies_logger ,review_logger , user_logger , main_loggin)       
