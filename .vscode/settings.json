@@ -2,6 +2,8 @@
     "python.analysis.extraPaths": [
         "./data/MovieLens",
         "./data/MovieLens/RawData/",
-        "./src/elasticsearch"
+        "./src/elasticsearch/",
+        ".src/elasticsearch/feature_engineering"
+
     ]
 }
