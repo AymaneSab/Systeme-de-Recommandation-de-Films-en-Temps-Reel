@@ -3,7 +3,8 @@
         "./data/MovieLens",
         "./data/MovieLens/RawData/",
         "./src/elasticsearch/",
-        ".src/elasticsearch/feature_engineering"
-
+        ".src/elasticsearch/feature_engineering",
+        "./data/MovieLens",
+        "./src/model"
     ]
 }

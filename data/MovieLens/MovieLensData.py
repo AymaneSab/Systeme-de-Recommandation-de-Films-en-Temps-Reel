@@ -5,6 +5,7 @@ import logging
 import json
 import os 
 from datetime import datetime 
+import pandas as pd
 
 # Assuming your RawData directory is under the current working directory
 raw_data_directory = '/home/hadoop/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/data/MovieLens/RawData'
@@ -34,7 +35,7 @@ def setup_logging(log_directory, logger_name):
     return logger
 
 def setup_Api_logging():
-    return setup_logging("Log/API_Movies_LogFiles", "API_logger")
+    return setup_logging("Log/API", "API_logger")
 
 # Function to read data files
 def read_data_files():
@@ -84,6 +85,28 @@ def create_json_entry(row):
     json_data = json.dumps(combined_data)
     
     return json_data
+
+def get_all_data():
+    api_logger = setup_Api_logging()
+    api_logger.info("Api Started")
+
+    try:
+        u_data, u_item, u_user = read_data_files()
+
+        # Apply genre extraction function to each row in u_item
+        u_item['genres'] = u_item.apply(extract_genres, axis=1)
+
+        # Merge relevant data
+        merged_data = pd.merge(u_data, u_item[['movieId', 'title', 'release_date', 'genres', 'IMDb_URL']], on='movieId')
+        merged_data = pd.merge(merged_data, u_user[['userId', 'age', 'gender', 'occupation', 'zipcode']], on='userId')
+
+        # Select only the desired columns
+        selected_columns = ['userId', 'movieId', 'rating', 'timestamp']
+        return merged_data[selected_columns]
+
+    except Exception as e:
+        logging.error(f"Error processing request: {e}")
+        return pd.DataFrame({"error": ["Internal Server Error"]}), 500
 
 @app.route('/movie_data', methods=['GET'])
 def get_movie_data():

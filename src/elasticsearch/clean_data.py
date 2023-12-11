@@ -8,21 +8,18 @@ def clean_and_preprocess_movie_data(kafka_stream_df):
         # Convert 'movieId' to string
         transformed_df = kafka_stream_df.withColumn("movieId", col("movieId").cast("string"))
 
-        # title
-        transformed_df = kafka_stream_df.withColumn("movieId", col("movieId").cast("string"))
 
-        # Convert 'release_date' and 'video_release_date' to datetime objects
-        # Convert 'release_date' and 'video_release_date' to datetime objects, with fallback to the original value on failure
-        transformed_df = transformed_df.withColumn("release_date", coalesce(to_date("release_date", 'yyyy-MM-dd'), col("release_date")))
-        transformed_df = transformed_df.withColumn("genres",  col("genres").cast("string"))
 
+        # Assuming "release_date" is a string column in the format '01-Jan-1995'
+        transformed_df = transformed_df.withColumn("release_date", coalesce(to_date("release_date", 'dd-MMM-yyyy'), col("release_date")))
+
+        # Format the date as 'yyyy-MM-dd'
+        transformed_df = transformed_df.withColumn("release_date", date_format("release_date", "yyyy-MM-dd"))
 
         transformed_df = transformed_df.withColumn("IMDb_URL", coalesce("IMDb_URL", lit("No Image Provided")))
 
         # Convert 'movie_average_rating' to float
         transformed_df = transformed_df.withColumn("movie_average_rating", lit(1.0).cast("float"))
-
-        # Add a default value for 'IMDb_URL' if not present
 
         return transformed_df
 
@@ -44,7 +41,6 @@ def clean_and_preprocess_review_data(kafka_stream_df):
 
         # Convert 'timestamp' to datetime format
         df = df.withColumn("timestamp", date_format(from_unixtime(col("timestamp").cast("bigint")), "yyyy-MM-dd"))
-
         # Convert data types if needed
         df = df.withColumn("userId", col("userId").cast("string"))
         df = df.withColumn("movieId", col("movieId").cast("string"))
@@ -60,7 +56,9 @@ def clean_and_preprocess_user_data(kafka_stream_df):
 
         # Handle missing values (replace 'your_default_value' with an appropriate default)
         transformed_df = kafka_stream_df.withColumn("age", col("age").cast("integer"))
+
         transformed_df = transformed_df.withColumn("gender", col("gender").cast("string"))
+        
         transformed_df = transformed_df.withColumn("occupation", col("occupation").cast("string"))
         transformed_df = transformed_df.withColumn("zipcode", col("zipcode").cast("string"))
 
