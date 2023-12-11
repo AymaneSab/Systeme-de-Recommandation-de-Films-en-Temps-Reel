@@ -1,3 +1,4 @@
+import time
 import findspark
 findspark.init()
 
@@ -37,7 +38,10 @@ def setup_logging(log_directory, logger_name):
     return logger
 
 def setup_sparkSessionInitialiser_logging():
-    return setup_logging("Log/Spark", "sparkSessionInitialiser")
+    return setup_logging("Log/SparkStreaming", "Spark_Sessions")
+
+def setup_ElasticSearchConnection_logging():
+    return setup_logging("Log/ElasticSearch", "ElasticSearchReequests")
 
 def setup_main_logging():
     return setup_logging("Log/Main_Script", "main")
@@ -52,12 +56,11 @@ def setup_sparkTreatment_user_logging():
     return setup_logging("Log/Kafka_User_Insertion", "sparkTreatment_user")
 
 def sparkSessionInitialiser(logger):
-
         packages = [
             "org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.0",
             "org.elasticsearch:elasticsearch-spark-30_2.12:8.4.2",
         ]
-        logger.info("Packages Loaded ")
+        logger.info("Packages Loaded Succefully ")
 
         # Initialize SparkSession for Elasticsearch
         spark = SparkSession.builder \
@@ -65,13 +68,12 @@ def sparkSessionInitialiser(logger):
             .config("spark.jars.packages", ",".join(packages)) \
             .getOrCreate()
         
-        logger.info("Spark Session Returned")
+        logger.info("Spark Session Returned Succefully ")
         
         return spark
 
 def sparkTreatment_movies(topicname, kafka_bootstrap_servers , spark_logger , movies_logger):
     try:
-        
         spark = sparkSessionInitialiser(spark_logger)
 
         movies_logger.info("sparkTreatment_movies")
@@ -111,10 +113,6 @@ def sparkTreatment_movies(topicname, kafka_bootstrap_servers , spark_logger , mo
         if not os.path.exists(checkpoint_location):
             os.makedirs(checkpoint_location)
 
-        es = connectToelastic(user_logger)
-
-        createMovieIndex(es, user_logger)
-
         # Write to Elasticsearch
         query = treated_users.writeStream \
             .outputMode("append") \
@@ -124,7 +122,6 @@ def sparkTreatment_movies(topicname, kafka_bootstrap_servers , spark_logger , mo
 
         query.awaitTermination()
         movies_logger.info("treated_users Sent To Elastic ")
-
 
     except Exception as e:
         movies_logger.error(f"An error occurred: {str(e)}")
@@ -136,6 +133,8 @@ def sparkTreatment_movies(topicname, kafka_bootstrap_servers , spark_logger , mo
 
 def write_movie_to_elasticsearch(df, epoch_id,movieId, session, logger):
     try:
+        es = connectToelastic(logger)
+
         calculate_movie_average_udf = lambda movieId: calculate_movie_rating_average(movieId, session, user_logger)
 
         treated_users = df.withColumn('movie_average_rating', lit(calculate_movie_average_udf(movieId)))
@@ -147,14 +146,18 @@ def write_movie_to_elasticsearch(df, epoch_id,movieId, session, logger):
             .option("es.resource", "movie/_doc") \
             .mode("append") \
             .save()
-
+        
+        time.sleep(2)
+        
     except Exception as e:
         # Handle the exception (print or log the error message)
         logger.error(f"Error in write_to_elasticsearch: {str(e)}")
 
+    finally :
+        es.transport.close()
+
 def sparkTreatment_reviews(topicname, kafka_bootstrap_servers , spark_logger , review_logger):
     try:
-
         spark = sparkSessionInitialiser(spark_logger)
 
         review_logger.info("----------> Packages Loaded Successfully ")
@@ -187,8 +190,6 @@ def sparkTreatment_reviews(topicname, kafka_bootstrap_servers , spark_logger , r
 
         es = connectToelastic(review_logger)
 
-        createReviewsIndex(es , review_logger)
-
         # Write to Elasticsearch
         treated_reviews.writeStream \
             .format("org.elasticsearch.spark.sql") \
@@ -199,14 +200,13 @@ def sparkTreatment_reviews(topicname, kafka_bootstrap_servers , spark_logger , r
             .option("checkpointLocation", checkpoint_location) \
             .start().awaitTermination()
         
-        
         review_logger.info("treated_reviews Sended To Elastic ")
-
 
     except Exception as e:
         review_logger.error(f"An error occurred: {str(e)}")
     finally:
         spark.stop()
+        es.transport.close()
 
 def sparkTreatment_user(topicname, kafka_bootstrap_servers, spark_logger, user_logger):
     try:
@@ -247,9 +247,6 @@ def sparkTreatment_user(topicname, kafka_bootstrap_servers, spark_logger, user_l
         if not os.path.exists(checkpoint_location):
             os.makedirs(checkpoint_location)
 
-        es = connectToelastic(user_logger)
-        createUserIndex(es, user_logger)
-
         # Write to Elasticsearch
         query = treated_users.writeStream \
             .outputMode("append") \
@@ -269,6 +266,8 @@ def sparkTreatment_user(topicname, kafka_bootstrap_servers, spark_logger, user_l
 
 def write_user_to_elasticsearch(df, epoch_id,userId, session, logger):
     try:
+        es = connectToelastic(user_logger)
+
         calculate_user_average_udf = lambda user_id: calculate_user_average(userId, session, user_logger)
 
         treated_users = df.withColumn('user_activity', lit(calculate_user_average_udf(userId)))
@@ -280,14 +279,23 @@ def write_user_to_elasticsearch(df, epoch_id,userId, session, logger):
             .option("es.resource", "user/_doc") \
             .mode("append") \
             .save()
-
+        
     except Exception as e:
         # Handle the exception (print or log the error message)
         logger.error(f"Error in write_to_elasticsearch: {str(e)}")
+    finally : 
+        es.transport.close()
 
-def runSparkTreatment(spark_logger , movies_logger , review_logger , user_logger , main_loggin):
+def runSparkTreatment(spark_logger ,elastic_logger, movies_logger , review_logger , user_logger , main_loggin):
 
     try:
+
+        es = connectToelastic(elastic_logger)
+
+        createMovieIndex(es, elastic_logger)
+        createReviewsIndex(es , elastic_logger)
+        createUserIndex(es, elastic_logger)
+
         # Create threads for sparkTreatment_movies and sparkTreatment_reviews
         movies_thread = threading.Thread(target=sparkTreatment_movies, args=("Movies", "localhost:9092" , spark_logger , movies_logger))
         reviews_thread = threading.Thread(target=sparkTreatment_reviews, args=("Reviews", "localhost:9092" , spark_logger , review_logger))
@@ -311,10 +319,12 @@ def runSparkTreatment(spark_logger , movies_logger , review_logger , user_logger
 
 
 spark_logger = setup_sparkSessionInitialiser_logging()  
+elastic_logger  = setup_ElasticSearchConnection_logging()
+
 movies_logger = setup_sparkTreatment_movies_logging()
 review_logger = setup_sparkTreatment_reviews_logging()
 user_logger = setup_sparkTreatment_user_logging()
 main_loggin = setup_main_logging()
 
 
-runSparkTreatment(spark_logger , movies_logger ,review_logger , user_logger , main_loggin)       
+runSparkTreatment(spark_logger , elastic_logger ,movies_logger ,review_logger , user_logger , main_loggin)       

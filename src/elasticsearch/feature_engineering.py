@@ -5,8 +5,6 @@ from pyspark.sql.types import StructType, StructField, StringType , IntegerType
 def calculate_user_average(user_id, session, logger):
     try:
 
-        logger.info(f"Duser_id : {user_id}")
-
         # Define the schema for Kafka messages
         kafka_schema = StructType([
             StructField("userId", StringType(), True),
@@ -27,13 +25,10 @@ def calculate_user_average(user_id, session, logger):
             .select("data.*") \
             .filter(col("userId") == user_id)
 
-        logger.info("Data Readed Successfully, Future Func {kafka_reviews_df}")
-
         # Get the count of user reviews without reading the entire data
         reviews_count = kafka_reviews_df.agg(count("*").alias("reviews_count")).collect()[0]['reviews_count']
-        
 
-        logger.info(f"----------------{reviews_count}")
+        logger.info(f"User Rating Average : {reviews_count}")
 
         return float(reviews_count)
 
@@ -44,9 +39,6 @@ def calculate_user_average(user_id, session, logger):
 
 def calculate_movie_rating_average(movieId, session, logger):
     try:
-
-        logger.info(f"movieId : {movieId}")
-
         # Define the schema for Kafka messages
         kafka_schema = StructType([
             StructField("userId", StringType(), True),
@@ -67,13 +59,10 @@ def calculate_movie_rating_average(movieId, session, logger):
             .select("data.*") \
             .filter(col("movieId") == movieId)
 
-        logger.info("Data Readed Successfully, Future Func {kafka_reviews_df}")
-
         # Get the count of user reviews without reading the entire data
         reviews_count = kafka_reviews_df.agg(count("*").alias("movie_average_rating")).collect()[0]['movie_average_rating']
         
-
-        logger.info(f"----------------{reviews_count}")
+        logger.info(f"User Rating Average : {reviews_count}")
 
         return float(reviews_count)
 

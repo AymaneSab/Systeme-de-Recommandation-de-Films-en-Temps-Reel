@@ -41,9 +41,9 @@ def createMovieIndex(esconnection, elastic_logger):
         "mappings": {
             "properties": {
                 "movieId": {"type": "keyword"},
-                "title": {"type": "text"},
-                "release_date": {"type": "text"},
-                "genrees": {"type": "text"},
+                "title": {"type": "keyword"},
+                "release_date": {"type": "date"},
+                "genres": {"type": "text"},  # Change to "text" if you are indexing an array of strings directly
                 "IMDb_URL": {"type": "keyword"},
                 "movie_average_rating": {"type": "float"}  
             }
@@ -73,7 +73,7 @@ def createReviewsIndex(esconnection, elastic_logger):
                 "userId": {"type": "keyword"},
                 "movieId": {"type": "keyword"},
                 "rating": {"type": "float"},  # Change the type to match your actual data type
-                "timestamp": {"type": "text"}  # Change the type to match your actual data type
+                "timestamp": {"type": "date"}  # Change the type to match your actual data type
             }
         }
     }
@@ -99,8 +99,8 @@ def createUserIndex(esconnection, elastic_logger):
             "properties": {
                 "userId": {"type": "keyword"},
                 "age": {"type": "keyword"},
-                "gender": {"type": "text"},
-                "occupation": {"type": "text"},
+                "gender": {"type": "keyword"},
+                "occupation": {"type": "keyword"},
                 "zipcode": {"type": "text"},
                 "user_activity": {"type": "float"} 
             }

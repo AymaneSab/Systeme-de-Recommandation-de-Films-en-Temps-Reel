@@ -1,96 +1,99 @@
-        try :
-            # Assuming calculate_user_average is defined correctly and available
-            # calculate_user_average_udf = lambda user_id: calculate_user_average(user_id, session, user_logger)
+# set the environment path to find Recommenders
+import sys
+import os
+from datetime import datetime
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import sys
+import pandas as pd
+import warnings
+import logging
 
-            # treated_users = treated_users.withColumn('user_activity', lit(calculate_user_average_udf(col("userId").cast(StringType()))))
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+import pyspark
+from pyspark.sql import SparkSession
+from pyspark.ml.recommendation import ALS
+import pyspark.sql.functions as F
+from pyspark.sql.functions import col 
+from pyspark.ml.tuning import CrossValidator
+from pyspark.sql.types import StructType, StructField
+from pyspark.sql.types import FloatType, IntegerType, LongType
+
+from pyspark.ml.recommendation import ALS
+from pyspark.ml.tuning import ParamGridBuilder, CrossValidator
+from pyspark.ml.evaluation import RegressionEvaluator
+from pyspark.mllib.evaluation import RegressionMetrics
 
 
-            user_logger.info("Aggregation Succefull")
-
-        except Exception as e :
-            user_logger.error(f"Aggregation Failed {str(e)}")
-
+from elasticsearch import Elasticsearch
+from elasticsearch.helpers import scan
+from pyspark.sql.functions import expr
 
 
+def get_movie_id_by_title(es, index_name, movie_title):
+    query = {
+        "query": {
+            "match": {
+                "title": movie_title
+            }
+        }
+    }
 
-            def sparkTreatment_user(topicname, kafka_bootstrap_servers, spark_logger, user_logger):
-    try:
-        # Initialize Spark session
-        session = SparkSession.builder.appName("YourAppName").getOrCreate()
-        user_logger.info("----------> Packages Loaded Successfully ")
+    # Use scan to get all documents matching the query
+    results = scan(es, index=index_name, query=query)
 
-        # Define the schema for Kafka messages
-        kafka_schema = StructType([
-            StructField("userId", IntegerType(), True),
-            StructField("age", StringType(), True),
-            StructField("gender", StringType(), True),
-            StructField("occupation", StringType(), True),
-            StructField("zipcode", StringType(), True)
-        ])
+    for result in results:
+        return result["_source"]["movieId"]
 
-        # Read data from Kafka topic with defined schema
-        df = session \
-            .readStream \
-            .format("kafka") \
-            .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
-            .option("subscribe", topicname) \
-            .load() \
-            .selectExpr("CAST(value AS STRING)") \
-            .select(explode(from_json("value", ArrayType(kafka_schema))).alias("data")) \
-            .select("data.*")
-        
-        try :
+    return None
 
-            treated_users = clean_and_preprocess_user_data(df)
-            user_logger.info("Transformation Succefull")
+def get_users_ids_for_movie_review(es, index_name, movie_id):
+    query = {
+        "query": {
+            "term": {
+                "movieId": movie_id
+            }
+        }
+    }
 
-        except Exception as e :
-            user_logger.error(f"Transformation Failed {str(e)}")
+    # Use scan to get all documents matching the query
+    results = scan(es, index=index_name, query=query)
 
-        checkpoint_location = "Elasticsearch/Checkpoint/Users"
+    user_ids = set()
+    for result in results:
+        user_ids.add(result["_source"]["userId"])
 
-        if not os.path.exists(checkpoint_location):
-            os.makedirs(checkpoint_location)
+    return list(user_ids)
 
-        es = connectToelastic(user_logger)
-        createUserIndex(es, user_logger)
+def get_recommendations_for_movie(es, spark ,best_model, movie_title, num_recommendations=5):
+    # Step 1: Get movieId for the given movie title
+    movie_index = "movie"
+    movie_id = get_movie_id_by_title(es, movie_index, movie_title)
 
-        # Write to Elasticsearch
-        query = treated_users.writeStream \
-            .outputMode("append") \
-            .option("checkpointLocation", checkpoint_location) \
-            .foreachBatch(lambda df, epoch_id: write_to_elasticsearch(df, epoch_id, session, user_logger)) \
-            .start()
+    if movie_id is None:
+        print(f"Movie with title '{movie_title}' not found.")
+        return None
 
-        query.awaitTermination()
-        user_logger.info("treated_users Sent To Elastic ")
+    review_index = "review"
+    # Step 2: Get user ids that have reviewed the movie
+    user_ids = get_users_ids_for_movie_review(es, review_index, movie_id)
 
-    except StreamingQueryException as sqe:
-        user_logger.error(f"Streaming query exception: {str(sqe)}")
-    except Exception as e:
-        user_logger.error(f"An error occurred: {str(e)}")
-    finally:
-        session.stop()
+    if not user_ids:
+        print(f"No user reviews found for the movie with title '{movie_title}'.")
+        return None
 
-def write_to_elasticsearch(df, epoch_id, session, logger):
-    try:
-        xx = lambda batch_df, batch_id: batch_df.select("userId").collect()
+    # Step 3: Create a DataFrame with user and movie data
+    user_movie_data = [(int(user_id),) for user_id in user_ids]
+    schema = StructType([StructField("userId", IntegerType(), True)])
+    user_movie_df = spark.createDataFrame(user_movie_data, schema)
 
-        user_logger.info(f" userId : {xx} ")
+    # Step 4: Use ALS model to get recommendations for the users
+    recommendations = best_model.recommendForUserSubset(user_movie_df, num_recommendations)
 
-        calculate_user_average_udf = lambda user_id: calculate_user_average(user_id, session, user_logger)
+    # Extract movie IDs from recommendations DataFrame
+    movie_ids = [movie.movieId for row in recommendations.rdd.collect() for movie in row.recommendations]
+    
+    return movie_ids
 
-        treated_users = df.withColumn('user_activity', lit(calculate_user_average_udf(df['userId'])))
-
-        # Write the batch data to Elasticsearch
-        treated_users.write \
-            .format("org.elasticsearch.spark.sql") \
-            .option("es.nodes", "localhost") \
-            .option("es.port", "9200") \
-            .option("es.resource", "user/_doc") \
-            .mode("append") \
-            .save()
-
-    except Exception as e:
-        # Handle the exception (print or log the error message)
-        logger.error(f"Error in write_to_elasticsearch: {str(e)}")
