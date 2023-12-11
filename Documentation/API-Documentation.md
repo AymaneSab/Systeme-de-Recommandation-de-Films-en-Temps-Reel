@@ -27,27 +27,26 @@ This API is built using Flask and serves movie-related data from the MovieLens d
 
    ```bash
    git clone https://github.com/your-username/your-repository.git
-   cd your-repository
    ```
-
 ## Usage
 ### GET /movie_data
 
- . Endpoint to retrieve movie data, including reviews and user details.
+- Endpoint to retrieve movie data, including reviews and user details.
 
- -- Request
+ - Request
 
-    The response is a streaming JSON containing movie, review, and user data.
+    - The response is a streaming JSON containing movie, review, and user data.
 
-    ```
-    curl http://localhost:5002/movie_data
+      ```bash
+      curl http://localhost:5002/movie_data
 
-    ```
- -- Response
+      ```
+ - Response
 
  ```
  {"movie": {"movieId": "1", "title": "Toy Story", "release_date": "1995-01-01", "genres": ["Animation", "Children", "Comedy"], "IMDb_URL": "http://www.imdb.com/title/tt0114709/"},
  "review": {"userId": "1", "movieId": "1", "rating": "5", "timestamp": "876893171"},
  "user": {"userId": "1", "age": "24", "gender": "M", "occupation": "technician", "zipcode": "85711"}}
+
 ```
 
