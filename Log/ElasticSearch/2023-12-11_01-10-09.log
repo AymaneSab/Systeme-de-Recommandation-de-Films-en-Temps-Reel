@@ -1,4 +1,0 @@
-2023-12-11 01:10:09,299 - INFO - Connected to elastic search Successfully
-2023-12-11 01:10:09,498 - INFO - Index 'movie' created successfully.
-2023-12-11 01:10:09,600 - INFO - Index 'review' created successfully.
-2023-12-11 01:10:09,703 - INFO - Index 'user' created successfully.

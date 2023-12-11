@@ -1,14 +1,10 @@
 # set the environment path to find Recommenders
-import sys
-import os
 from datetime import datetime
 import pandas as pd
 import numpy as np
 import seaborn as sns
-import sys
 import pandas as pd
 import warnings
-import logging
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
