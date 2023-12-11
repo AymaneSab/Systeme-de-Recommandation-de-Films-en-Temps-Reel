@@ -7,6 +7,7 @@ from pyspark.sql import SparkSession
 sys.path.append("/home/hadoop/Syst-me-de-Recommandation-de-Films-en-Temps-R-el-avec-Apache-Spark-Elasticsearch-Kibana-et-Flask/src/model/")
 
 from als_model import get_recommendations_for_movie
+from PosterAPI import get_movie_poster
 
 # Load the saved model in another script
 from pyspark.ml.recommendation import ALSModel
@@ -57,7 +58,8 @@ def get_recommendations():
                 recommendations.append({
                     'title': movie_info['title'],
                     'release_date': movie_info['release_date'],
-                    'genres': movie_info['genres']
+                    'genres': movie_info['genres'] ,
+                    'poster': get_movie_poster(movie_info['title']) 
                 })
 
         if not recommendations:

@@ -43,7 +43,7 @@ def createMovieIndex(esconnection, elastic_logger):
                 "movieId": {"type": "keyword"},
                 "title": {"type": "keyword"},
                 "release_date": {"type": "date"},
-                "genres": {"type": "text"},  # Change to "text" if you are indexing an array of strings directly
+                "genres": {"type": "keyword"},  # Change to "text" if you are indexing an array of strings directly
                 "IMDb_URL": {"type": "keyword"},
                 "movie_average_rating": {"type": "float"}  
             }

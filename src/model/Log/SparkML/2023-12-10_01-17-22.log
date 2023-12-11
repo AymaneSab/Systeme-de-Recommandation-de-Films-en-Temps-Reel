@@ -1,3 +1,0 @@
-2023-12-10 01:17:23,395 - INFO - All Data Loaded From API
-2023-12-10 01:19:17,938 - ERROR - Error: 'DataFrame' object has no attribute 'show'
-2023-12-10 01:20:38,070 - ERROR - Error: 'DataFrame' object has no attribute 'show'
