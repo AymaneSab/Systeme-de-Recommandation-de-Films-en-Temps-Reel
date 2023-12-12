@@ -45,7 +45,7 @@ This API is built using Flask and serves movie-related data from the MovieLens d
       ```
  - Response
 
-      ```
+      ```bash
       {"movie": {"movieId": "1", "title": "Toy Story", "release_date": "1995-01-01", "genres": ["Animation", "Children", "Comedy"], "IMDb_URL": "http://www.imdb.com/title/tt0114709/"},
       "review": {"userId": "1", "movieId": "1", "rating": "5", "timestamp": "876893171"},
       "user": {"userId": "1", "age": "24", "gender": "M", "occupation": "technician", "zipcode": "85711"}}
