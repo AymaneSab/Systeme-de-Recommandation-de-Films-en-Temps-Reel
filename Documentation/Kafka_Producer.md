@@ -27,7 +27,7 @@ The script uses a custom logging setup. Logs are stored in the "Log/KafkaProduce
 
 ## Functions
 
-### 1. `setup_logging(log_directory, logger_name)`
+### 1. setup_logging(log_directory, logger_name)
 
    - Set up logging configuration.
    - Parameters:
