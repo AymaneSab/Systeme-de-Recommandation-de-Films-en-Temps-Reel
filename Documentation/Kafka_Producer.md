@@ -4,7 +4,7 @@
 
 This script is designed to ingest movie-related data (movies, reviews, and users) from a streaming API into Kafka topics. It utilizes the Confluent Kafka Python library for Kafka interactions and requests library for API communication.
 
-! [Alt text](https://github.com/AymaneSab/Systeme-de-Recommandation-de-Films-en-Temps-Reel/blob/main/Documentation/Captures/Screen%20Shot%202023-12-12%20at%2009.55.17.png)
+![Alt text](https://github.com/AymaneSab/Systeme-de-Recommandation-de-Films-en-Temps-Reel/blob/main/Documentation/Captures/Screen%20Shot%202023-12-12%20at%2009.55.17.png)
 ## Prerequisites
 
 Before running the script, ensure the following:
