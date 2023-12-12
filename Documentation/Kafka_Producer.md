@@ -35,11 +35,11 @@ The script uses a custom logging setup. Logs are stored in the "Log/KafkaProduce
      - `logger_name`: Name of the logger.
    - Returns: Configured logger.
 
-### 2. `setup_KafkaLoader_logging()`
+### 2. setup_KafkaLoader_logging()
 
    - Set up logging specifically for the Kafka Producer.
 
-### 3. `create_kafka_topic(topic, admin_client, producer_logger)`
+### 3. create_kafka_topic(topic, admin_client, producer_logger)
 
    - Create a Kafka topic if it doesn't exist.
    - Parameters:
@@ -47,7 +47,7 @@ The script uses a custom logging setup. Logs are stored in the "Log/KafkaProduce
      - `admin_client`: Kafka AdminClient instance.
      - `producer_logger`: Logger for producer-specific logs.
 
-### 4. `produce_to_Topics(movieTopic, reviewTopic, userTopic, producer_logger)`
+### 4. produce_to_Topics(movieTopic, reviewTopic, userTopic, producer_logger)
 
    - Continuously fetch movie data from the streaming API and produce it to respective Kafka topics.
    - Parameters:
@@ -56,7 +56,7 @@ The script uses a custom logging setup. Logs are stored in the "Log/KafkaProduce
      - `userTopic`: Kafka topic for user data.
      - `producer_logger`: Logger for producer-specific logs.
 
-### 5. `runKafkaProducer(topic1, topic2, topic3)`
+### 5. runKafkaProducer(topic1, topic2, topic3)
 
    - Main function to orchestrate the Kafka producer.
    - Parameters:
