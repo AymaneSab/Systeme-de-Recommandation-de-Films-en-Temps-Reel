@@ -2,6 +2,7 @@
 
 This project implements a real-time movie recommendation system using Apache Spark Streaming and Kafka. The system processes movie, review, and user data from Kafka topics, performs data cleaning and preprocessing, and stores the processed data in Elasticsearch for further analysis and recommendation.
 
+![Alt text](https://github.com/AymaneSab/Systeme-de-Recommandation-de-Films-en-Temps-Reel/blob/main/Documentation/Captures/Screen%20Shot%202023-12-12%20at%2011.56.47.png)
 ## Prerequisites
 
 - Apache Spark
