@@ -42,7 +42,6 @@ This API is built using Flask and serves movie-related data from the MovieLens d
 
       ```
  - Response
- - 
     - The response is a streaming JSON containing movie, review, and user data.
       
       ```bash
