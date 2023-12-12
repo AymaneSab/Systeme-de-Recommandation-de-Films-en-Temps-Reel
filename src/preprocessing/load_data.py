@@ -132,3 +132,4 @@ topic2 = "Reviews"
 topic3 = "Users"
 
 runKafkaProducer(topic1, topic2 , topic3)
+ 
