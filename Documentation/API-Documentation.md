@@ -37,18 +37,18 @@ This API is built using Flask and serves movie-related data from the MovieLens d
 
  - Request
 
-    - The response is a streaming JSON containing movie, review, and user data.
-
       ```bash
       curl http://localhost:5002/movie_data
-
       ```
  - Response
-
+    - The response is a streaming JSON containing movie, review, and user data.
+      
+      ```bash
+      {"movie": {"movieId": "1", "title": "Toy Story", "release_date": "1995-01-01", "genres": ["Animation", "Children", "Comedy"], "IMDb_URL": 
+       "http://www.imdb.com/title/tt0114709/"},
+       "review": {"userId": "1", "movieId": "1", "rating": "5", "timestamp": "876893171"},
+       "user": {"userId": "1", "age": "24", "gender": "M", "occupation": "technician", "zipcode": "85711"}}
       ```
-      {"movie": {"movieId": "1", "title": "Toy Story", "release_date": "1995-01-01", "genres": ["Animation", "Children", "Comedy"], "IMDb_URL": "http://www.imdb.com/title/tt0114709/"},
-      "review": {"userId": "1", "movieId": "1", "rating": "5", "timestamp": "876893171"},
-      "user": {"userId": "1", "age": "24", "gender": "M", "occupation": "technician", "zipcode": "85711"}}
 
-      ```
+    
 
