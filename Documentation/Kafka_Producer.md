@@ -25,7 +25,7 @@ Before running the script, ensure the following:
 ## Logging
 
 The script uses a custom logging setup. Logs are stored in the "Log/KafkaProducer" directory. Each log file is named with a timestamp (e.g., "2023-12-11_14-30-00.log").
-
+![Alt text](https://github.com/AymaneSab/Systeme-de-Recommandation-de-Films-en-Temps-Reel/blob/main/Documentation/Captures/Screen%20Shot%202023-12-12%20at%2009.58.31.png)
 ## Functions
 
 ### 1. setup_logging(log_directory, logger_name)
